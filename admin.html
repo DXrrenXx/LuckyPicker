@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 随机抽人系统</title>
+    <style>
+        :root {
+            --bg-secondary: rgba(32, 32, 32, 0.75);
+            --bg-tertiary: rgba(45, 45, 45, 0.75);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --accent-default: #60CDFF;
+            --accent-hover: #7AD4FF;
+            --accent-text: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255,255,255, 0.78);
+            --text-tertiary: rgba(255, 255, 255, 0.54);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.36);
+            --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.14);
+            --radius-card: 16px;
+            --radius-button: 8px;
+            --radius-small: 4px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: var(--spacing-xl);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            color: var(--accent-default);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            background: rgba(35, 35, 35, 0.75);
+            backdrop-filter: blur(40px);
+            border-radius: var(--radius-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-button);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-default);
+            box-shadow: 0 0 0 2px rgba(96, 205, 255, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: var(--spacing-xs);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-button);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: var(--accent-default);
+            color: var(--accent-text);
+            box-shadow: var(--shadow-button), 0 0 20px rgba(96, 205, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff8585;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-sm {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 14px;
+            min-width: auto;
+        }
+
+        .class-list {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .class-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-button);
+        }
+
+        .class-info {
+            flex: 1;
+        }
+
+        .class-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .class-count {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .class-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: var(--radius-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+        }
+
+        .modal-body {
+            padding: var(--spacing-lg);
+        }
+
+        .modal-footer {
+            padding: var(--spacing-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+
+        .message {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-button);
+            margin-bottom: var(--spacing-lg);
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ECDC4;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">管理后台</div>
+            <a href="index.html" class="back-link">返回抽人页面</a>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="card">
+            <div class="card-title">添加新班级</div>
+            <div class="form-group">
+                <label class="form-label">班级名称</label>
+                <input type="text" class="form-input" id="className" placeholder="例如：高一(1)班">
+            </div>
+            <div class="form-group">
+                <label class="form-label">学生名单（每行一个名字）</label>
+                <textarea class="form-input form-textarea" id="studentNames" placeholder="张三&#10;李四&#10;王五"></textarea>
+                <div class="form-hint">提示：每行一个学生姓名</div>
+            </div>
+            <button class="btn btn-primary" onclick="addClass()">添加班级</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">班级列表</div>
+            <div class="class-list" id="classList">
+                <div class="empty-state">暂无班级，请添加</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">编辑班级</span>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editClassId">
+                <div class="form-group">
+                    <label class="form-label">班级名称</label>
+                    <input type="text" class="form-input" id="editClassName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">学生名单（每行一个名字）</label>
+                    <textarea class="form-input form-textarea" id="editStudentNames"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://oeavmammvqjapqebhrfn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lYXZtYW1tdnFqYXBxZWJocmZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTczNzgsImV4cCI6MjA4Nzc3MzM3OH0.i4ryKmtDtpDyCqlGu7fqpMa3T8eoD7CmcfWmISxDgE8';
+
+        let classes = [];
+
+        async function init() {
+            await loadClasses();
+        }
+
+        async function loadClasses() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/classes?select=*&order=created_at`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (response.ok) {
+                    classes = await response.json();
+                    renderClassList();
+                }
+            } catch (err) {
+                showMessage('加载失败: ' + err.message, 'error');
+            }
+        }
+
+        async function renderClassList() {
+            const classListEl = document.getElementById('classList');
+
+            if (classes.length === 0) {
+                classListEl.innerHTML = '<div class="empty-state">暂无班级，请添加</div>';
+                return;
+            }
+
+            const classesWithCount = await Promise.all(
+                classes.map(async (cls) => {
+                    try {
+                        const response = await fetch(
+                            `${SUPABASE_URL}/rest/v1/students?class_id=eq.${cls.id}&select=id`,
+                            {
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                                }
+                            }
+                        );
+                        const students = await response.json();
+                        return { ...cls, studentCount: students.length };
+                    } catch {
+                        return { ...cls, studentCount: 0 };
+                    }
+                })
+            );
+
+            classListEl.innerHTML = classesWithCount.map(cls => `
+                <div class="class-item">
+                    <div class="class-info">
+                        <div class="class-name">${cls.name}</div>
+                        <div class="class-count">${cls.studentCount || 0} 名学生</div>
+                    </div>
+                    <div class="class-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="openEditModal('${cls.id}')">编辑</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteClass('${cls.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function addClass() {
+            const className = document.getElementById('className').value.trim();
+            const studentNames = document.getElementById('studentNames').value.trim();
+
+            if (!className) {
+                showMessage('请输入班级名称', 'error');
+                return;
+            }
+
+            if (!studentNames) {
+                showMessage('请输入学生名单', 'error');
+                return;
+            }
+
+            try {
+                const classResponse = await fetch(`${SUPABASE_URL}/rest/v1/classes`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({ name: className })
+                });
+
+                if (!classResponse.ok) {
+                    throw new Error('创建班级失败');
+                }
+
+                const newClass = await classResponse.json();
+                const classId = newClass[0].id;
+
+                const names = studentNames.split('\n').map(n => n.trim()).filter(n => n);
+                const students = names.map(name => ({
+                    name: name,
+                    class_id: classId
+                }));
+
+                if (students.length > 0) {
+                    const studentResponse = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(students)
+                    });
+
+                    if (!studentResponse.ok) {
+                        throw new Error('添加学生失败');
+                    }
+                }
+
+                showMessage('添加成功！', 'success');
+                document.getElementById('className').value = '';
+                document.getElementById('studentNames').value = '';
+                await loadClasses();
+            } catch (err) {
+                showMessage('添加失败: ' + err.message, 'error');
+            }
+        }
+
+        async function deleteClass(classId) {
+            if (!confirm('确定要删除这个班级吗？')) {
+                return;
+            }
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/students?class_id=eq.${classId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${classId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                showMessage('删除成功！', 'success');
+                await loadClasses();
+            } catch (err) {
+                showMessage('删除失败: ' + err.message, 'error');
+            }
+        }
+
+        async function openEditModal(classId) {
+            const cls = classes.find(c => c.id === classId);
+            if (!cls) return;
+
+            document.getElementById('editClassId').value = classId;
+            document.getElementById('editClassName').value = cls.name;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/students?class_id=eq.${classId}&select=name&order=name`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+                const students = await response.json();
+                document.getElementById('editStudentNames').value = students.map(s => s.name).join('\n');
+            } catch (err) {
+                console.error('加载学生失败:', err);
+            }
+
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        async function saveEdit() {
+            const classId = document.getElementById('editClassId').value;
+            const className = document.getElementById('editClassName').value.trim();
+            const studentNames = document.getElementById('editStudentNames').value.trim();
+
+            if (!className) {
+                showMessage('请输入班级名称', 'error');
+                return;
+            }
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/classes?id=eq.${classId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: className })
+                });
+
+                await fetch(`${SUPABASE_URL}/rest/v1/students?class_id=eq.${classId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                const names = studentNames.split('\n').map(n => n.trim()).filter(n => n);
+                const students = names.map(name => ({
+                    name: name,
+                    class_id: classId
+                }));
+
+                if (students.length > 0) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/students`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(students)
+                    });
+                }
+
+                showMessage('保存成功！', 'success');
+                closeEditModal();
+                await loadClasses();
+            } catch (err) {
+                showMessage('保存失败: ' + err.message, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message show ${type}`;
+
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 3000);
+        }
+
+        init();
+    </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+<div class="inland-security-footer">
+  <div class="tooltip-container">
+    <div class="trigger-content">
+      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
+        <span>© 2026 MiniMax</span>
+      </a>
+    </div>
+    <div class="tooltip-content">
+      <section class="info-section">
+        <span>上海稀宇科技有限公司</span>
+      </section>
+
+      <section class="info-section">
+        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
+          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
+          <span class="underline-text">沪公网安备31010402010179号</span>
+        </a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
+          沪ICP备2023003282号-38
+        </a>
+      </section>
+
+      <section class="info-section">
+        <span>模型名称：MiniMax</span>
+        <span>备案号：Shanghai-MiniMax-202505230046</span>
+      </section>
+
+      <section class="info-section">
+        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
+          用户协议
+        </a>
+        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
+          隐私政策
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
